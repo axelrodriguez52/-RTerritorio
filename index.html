@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>RTerritorio - Registro de Territorios</title>
+  <meta name="description" content="App para registrar territorios, sincronizada con Google Sheets">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="RTerritorio">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="login-header">
+        <h1>RTerritorio</h1>
+        <p>Ingresa tus credenciales para acceder</p>
+      </div>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="loginUser">Usuario</label>
+          <input type="text" id="loginUser" required placeholder="Tu usuario" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="loginPass">Contraseña</label>
+          <input type="password" id="loginPass" required placeholder="Tu contraseña" autocomplete="current-password">
+        </div>
+        <button type="submit" id="btnLogin" class="btn btn-primary btn-full">Ingresar</button>
+        <p id="loginError" class="login-error" style="display:none;"></p>
+      </form>
+    </div>
+  </div>
+
+  <div id="app-content" style="display:none;">
+    <header>
+      <div class="header-content">
+        <div>
+          <h1>RTerritorio</h1>
+          <p>Registro de Territorios</p>
+        </div>
+        <div class="header-right">
+          <span id="userDisplay" class="user-display"></span>
+          <button id="btnLogout" class="btn btn-logout">Salir</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section id="form-section">
+        <h2 id="form-title">Nuevo Registro</h2>
+        <form id="registro-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="nombre">Nombre *</label>
+              <input type="text" id="nombre" required placeholder="Ej: Juan Pérez">
+            </div>
+            <div class="form-group">
+              <label for="territorio">Territorio *</label>
+              <input type="text" id="territorio" required placeholder="Ej: Zona Norte">
+            </div>
+            <div class="form-group">
+              <label for="fechaInicio">Fecha de Inicio *</label>
+              <input type="date" id="fechaInicio" required>
+            </div>
+            <div class="form-group">
+              <label for="fechaFin">Fecha de Finalización</label>
+              <input type="date" id="fechaFin">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" id="btnGuardar" class="btn btn-primary">Registrar</button>
+            <button type="button" id="btnCancelar" class="btn btn-secondary" style="display:none;">Cancelar</button>
+          </div>
+          <input type="hidden" id="editId" value="">
+        </form>
+      </section>
+
+      <section id="table-section">
+        <div class="table-header">
+          <input type="text" id="buscador" placeholder="Buscar por nombre o territorio...">
+          <button id="btnExportar" class="btn btn-export">Exportar Excel</button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Territorio</th>
+                <th>Fecha Inicio</th>
+                <th>Fecha Fin</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="registros">
+            </tbody>
+          </table>
+        </div>
+        <p id="no-records" class="no-records" style="display:none;">No hay registros</p>
+      </section>
+    </main>
+
+    <footer>
+      <p>RTerritorio - Registros sincronizados con Google Sheets</p>
+    </footer>
+  </div>
+
+  <div id="notification" class="notification"></div>
+
+  <div id="confirm-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <p>¿Estás seguro de que deseas eliminar este registro?</p>
+      <div class="modal-actions">
+        <button id="btnConfirmarEliminar" class="btn btn-danger">Eliminar</button>
+        <button id="btnCancelarEliminar" class="btn btn-secondary">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js?v=3"></script>
+  <script src="js/export.js?v=3"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js");
+    }
+  </script>
+</body>
+</html>
