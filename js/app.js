@@ -372,7 +372,8 @@ function renderizarTabla(data) {
 
 function formatoFecha(fecha) {
   if (!fecha) return "";
-  var parts = fecha.split("-");
+  var dateStr = fecha.split("T")[0];
+  var parts = dateStr.split("-");
   if (parts.length === 3) {
     return parts[2] + "/" + parts[1] + "/" + parts[0];
   }
