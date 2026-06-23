@@ -123,11 +123,13 @@
     </div>
   </div>
 
-  <script src="js/app.js?v=4"></script>
-  <script src="js/export.js?v=4"></script>
+  <script src="js/app.js?v=5"></script>
+  <script src="js/export.js?v=5"></script>
   <script>
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js");
+      navigator.serviceWorker.register("service-worker.js").then(function(reg) {
+        reg.update();
+      });
     }
   </script>
 </body>
