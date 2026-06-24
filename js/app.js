@@ -1,13 +1,10 @@
-// PASO 1: Ve a tu Google Sheet → Extensiones → Apps Script
-// PASO 2: Implementar → Implementar nueva implementación → App web
-// PASO 3: Ejecutar como: Yo | Acceso: Cualquier persona
-// PASO 4: Copia la URL que te dé (empieza con https://script.google.com/macros/s/.../exec)
-// PASO 5: Pega esa URL aquí abajo
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwShFMlDdUvhTAzOqwM027iYqB2dQY1LecGmzEd3hgHGgxbpWxXHkLUsj9owEBzXT6sdw/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbz6vIXpFLwN6T_sL6D2hRgFmk1Y546BnW9AsCz2TKXcs1tkAsJIpcu0qnDSCFckuyPg/exec";
 
 let registros = [];
 let idToDelete = null;
 let currentUser = null;
+let heartbeatInterval = null;
+let onlineInterval = null;
 
 const loginScreen = document.getElementById("login-screen");
 const appContent = document.getElementById("app-content");
@@ -36,8 +33,10 @@ const confirmModal = document.getElementById("confirm-modal");
 const btnConfirmarEliminar = document.getElementById("btnConfirmarEliminar");
 const btnCancelarEliminar = document.getElementById("btnCancelarEliminar");
 const notification = document.getElementById("notification");
+const onlineSection = document.getElementById("online-section");
+const onlineList = document.getElementById("online-list");
 
-var APP_VERSION = "v3";
+var APP_VERSION = "v4";
 
 document.addEventListener("DOMContentLoaded", function() {
   var savedVersion = localStorage.getItem("rt_version");
@@ -65,6 +64,9 @@ loginForm.addEventListener("submit", function(e) {
 btnLogin.addEventListener("click", login);
 
 btnLogout.addEventListener("click", function() {
+  fetch(APPS_SCRIPT_URL + "?action=logout&user=" + encodeURIComponent(currentUser.user));
+  clearInterval(heartbeatInterval);
+  clearInterval(onlineInterval);
   localStorage.removeItem("rt_session");
   currentUser = null;
   loginScreen.style.display = "flex";
@@ -114,13 +116,50 @@ function showApp() {
   appContent.style.display = "block";
   userDisplay.textContent = (currentUser.nombre || currentUser.user) + " (" + currentUser.rol + ")";
 
-  if (currentUser.rol === "admin") {
+  if (isAdmin()) {
     btnExportar.style.display = "inline-block";
+    onlineSection.style.display = "block";
+    cargarOnline();
+    onlineInterval = setInterval(cargarOnline, 10000);
   } else {
     btnExportar.style.display = "none";
+    onlineSection.style.display = "none";
   }
 
+  iniciarHeartbeat();
   cargarRegistros();
+}
+
+function iniciarHeartbeat() {
+  heartbeatInterval = setInterval(function() {
+    fetch(APPS_SCRIPT_URL + "?action=heartbeat&user=" + encodeURIComponent(currentUser.user));
+  }, 30000);
+}
+
+async function cargarOnline() {
+  try {
+    var response = await fetch(APPS_SCRIPT_URL + "?action=getOnline");
+    var result = await response.json();
+    if (result.success) {
+      renderOnlineUsers(result.data);
+    }
+  } catch (e) {}
+}
+
+function renderOnlineUsers(users) {
+  onlineList.innerHTML = "";
+  if (users.length === 0) {
+    onlineList.innerHTML = '<p class="online-empty">No hay usuarios conectados</p>';
+    return;
+  }
+  users.forEach(function(u) {
+    var div = document.createElement("div");
+    div.className = "online-user";
+    div.innerHTML = '<span class="online-dot"></span>' +
+      '<span class="online-name">' + escapeHtml(u.nombre) + '</span>' +
+      '<span class="online-role">' + escapeHtml(u.rol) + '</span>';
+    onlineList.appendChild(div);
+  });
 }
 
 function isAdmin() {
@@ -210,7 +249,7 @@ async function cargarRegistros() {
       showNotification("Error al cargar registros", "error");
     }
   } catch (error) {
-    showNotification("Error de conexión. Verifica la URL de Apps Script.", "error");
+    showNotification("Error de conexión", "error");
     console.error(error);
   }
 }

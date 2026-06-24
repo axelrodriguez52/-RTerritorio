@@ -456,6 +456,89 @@ footer {
   letter-spacing: -0.01em;
 }
 
+.online-card {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 1.25rem;
+  overflow: hidden;
+}
+
+.online-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.875rem;
+}
+
+.online-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.online-count {
+  background: var(--success);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.1875rem 0.5rem;
+  border-radius: 20px;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.online-user {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.625rem 0;
+  border-bottom: 0.5px solid var(--fill);
+}
+
+.online-user:last-child {
+  border-bottom: none;
+}
+
+.online-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  flex-shrink: 0;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.online-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+  letter-spacing: -0.01em;
+}
+
+.online-role {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.online-empty {
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 0.8125rem;
+  padding: 1rem;
+  font-weight: 500;
+}
+
 .login-screen {
   min-height: 100vh;
   min-height: 100dvh;
