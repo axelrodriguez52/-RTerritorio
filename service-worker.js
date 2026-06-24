@@ -1,6 +1,4 @@
-var CACHE_NAME = "rterritorio-v8";
-
-self.addEventListener("install", function(event) {
+self.addEventListener("install", function() {
   self.skipWaiting();
 });
 
@@ -18,9 +16,5 @@ self.addEventListener("activate", function(event) {
 });
 
 self.addEventListener("fetch", function(event) {
-  event.respondWith(
-    fetch(event.request).catch(function() {
-      return caches.match(event.request);
-    })
-  );
+  event.respondWith(fetch(event.request));
 });
