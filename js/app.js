@@ -17,7 +17,6 @@ const btnLogout = document.getElementById("btnLogout");
 const userDisplay = document.getElementById("userDisplay");
 
 const form = document.getElementById("registro-form");
-const nombreInput = document.getElementById("nombre");
 const territorioInput = document.getElementById("territorio");
 const fechaInicioInput = document.getElementById("fechaInicio");
 const fechaFinInput = document.getElementById("fechaFin");
@@ -174,7 +173,7 @@ form.addEventListener("submit", function(e) {
   e.preventDefault();
 
   var datos = {
-    nombre: nombreInput.value.trim(),
+    nombre: currentUser.nombre,
     territorio: territorioInput.value.trim(),
     fechaInicio: fechaInicioInput.value,
     fechaFin: fechaFinInput.value,
@@ -321,7 +320,6 @@ function prepararEdicion(id) {
     return;
   }
 
-  nombreInput.value = registro.nombre;
   territorioInput.value = registro.territorio;
   fechaInicioInput.value = registro.fechaInicio;
   fechaFinInput.value = registro.fechaFin || "";
