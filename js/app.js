@@ -22,7 +22,6 @@ const btnCancelarEliminar = document.getElementById("btnCancelarEliminar");
 const notification = document.getElementById("notification");
 
 document.addEventListener("DOMContentLoaded", function() {
-  btnExportar.style.display = "inline-block";
   cargarRegistros();
 });
 
@@ -50,14 +49,6 @@ form.addEventListener("submit", function(e) {
 });
 
 btnCancelar.addEventListener("click", cancelarEdicion);
-
-btnExportar.addEventListener("click", function() {
-  if (registros.length === 0) {
-    showNotification("No hay registros para exportar", "error");
-    return;
-  }
-  exportarAExcel(registros);
-});
 
 buscador.addEventListener("input", function() {
   var term = this.value.toLowerCase();
