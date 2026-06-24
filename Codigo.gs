@@ -48,7 +48,7 @@ function validarLogin(user, pass) {
   var data = sheet.getDataRange().getValues();
 
   for (var i = 1; i < data.length; i++) {
-    if (String(data[i][0]).trim() === user && String(data[i][1]).trim() === pass) {
+    if (String(data[i][0]).trim().toLowerCase() === user.toLowerCase() && String(data[i][1]).trim() === pass) {
       return jsonResponse({
         success: true,
         message: "Login exitoso",
