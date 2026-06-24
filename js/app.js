@@ -2,6 +2,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0blKDUCUDVZaP
 
 let registros = [];
 let idToDelete = null;
+let idToEdit = null;
 
 const form = document.getElementById("registro-form");
 const nombreInput = document.getElementById("nombre");
@@ -19,6 +20,9 @@ const btnExportar = document.getElementById("btnExportar");
 const confirmModal = document.getElementById("confirm-modal");
 const btnConfirmarEliminar = document.getElementById("btnConfirmarEliminar");
 const btnCancelarEliminar = document.getElementById("btnCancelarEliminar");
+const editModal = document.getElementById("edit-modal");
+const btnConfirmarEditar = document.getElementById("btnConfirmarEditar");
+const btnCancelarEditar = document.getElementById("btnCancelarEditar");
 const notification = document.getElementById("notification");
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -76,6 +80,39 @@ confirmModal.addEventListener("click", function(e) {
   if (e.target === confirmModal) {
     confirmModal.style.display = "none";
     idToDelete = null;
+  }
+});
+
+btnConfirmarEditar.addEventListener("click", function() {
+  if (idToEdit) {
+    var registro = registros.find(function(r) { return r.id === idToEdit; });
+    if (registro) {
+      nombreInput.value = registro.nombre;
+      territorioInput.value = registro.territorio;
+      fechaInicioInput.value = registro.fechaInicio;
+      fechaFinInput.value = registro.fechaFin || "";
+      editIdInput.value = registro.id;
+
+      formTitle.textContent = "Editar Registro";
+      btnGuardar.textContent = "Actualizar";
+      btnCancelar.style.display = "inline-block";
+
+      document.getElementById("form-section").scrollIntoView({ behavior: "smooth" });
+    }
+    editModal.style.display = "none";
+    idToEdit = null;
+  }
+});
+
+btnCancelarEditar.addEventListener("click", function() {
+  editModal.style.display = "none";
+  idToEdit = null;
+});
+
+editModal.addEventListener("click", function(e) {
+  if (e.target === editModal) {
+    editModal.style.display = "none";
+    idToEdit = null;
   }
 });
 
@@ -158,17 +195,8 @@ function prepararEdicion(id) {
   var registro = registros.find(function(r) { return r.id === id; });
   if (!registro) return;
 
-  nombreInput.value = registro.nombre;
-  territorioInput.value = registro.territorio;
-  fechaInicioInput.value = registro.fechaInicio;
-  fechaFinInput.value = registro.fechaFin || "";
-  editIdInput.value = registro.id;
-
-  formTitle.textContent = "Editar Registro";
-  btnGuardar.textContent = "Actualizar";
-  btnCancelar.style.display = "inline-block";
-
-  document.getElementById("form-section").scrollIntoView({ behavior: "smooth" });
+  idToEdit = id;
+  editModal.style.display = "flex";
 }
 
 function cancelarEdicion() {
