@@ -15,6 +15,7 @@ const loginError = document.getElementById("loginError");
 const btnLogin = document.getElementById("btnLogin");
 const btnLogout = document.getElementById("btnLogout");
 const userDisplay = document.getElementById("userDisplay");
+const rememberMe = document.getElementById("rememberMe");
 
 const form = document.getElementById("registro-form");
 const territorioInput = document.getElementById("territorio");
@@ -41,6 +42,7 @@ document.addEventListener("DOMContentLoaded", function() {
   var savedVersion = localStorage.getItem("rt_version");
   if (savedVersion !== APP_VERSION) {
     localStorage.removeItem("rt_session");
+    localStorage.removeItem("rt_remember");
     localStorage.setItem("rt_version", APP_VERSION);
   }
 
@@ -52,6 +54,15 @@ document.addEventListener("DOMContentLoaded", function() {
       return;
     }
     showApp();
+    return;
+  }
+
+  var remembered = localStorage.getItem("rt_remember");
+  if (remembered) {
+    var creds = JSON.parse(remembered);
+    loginUser.value = creds.user || "";
+    loginPass.value = creds.pass || "";
+    rememberMe.checked = true;
   }
 });
 
@@ -67,12 +78,14 @@ btnLogout.addEventListener("click", function() {
   clearInterval(heartbeatInterval);
   clearInterval(onlineInterval);
   localStorage.removeItem("rt_session");
+  localStorage.removeItem("rt_remember");
   currentUser = null;
-  loginScreen.style.display = "flex";
-  appContent.style.display = "none";
   loginUser.value = "";
   loginPass.value = "";
+  rememberMe.checked = false;
   loginError.style.display = "none";
+  loginScreen.style.display = "flex";
+  appContent.style.display = "none";
 });
 
 async function login() {
@@ -96,6 +109,13 @@ async function login() {
     if (result.success) {
       currentUser = { user: result.user, nombre: result.nombre, rol: result.rol };
       localStorage.setItem("rt_session", JSON.stringify(currentUser));
+
+      if (rememberMe.checked) {
+        localStorage.setItem("rt_remember", JSON.stringify({ user: user, pass: pass }));
+      } else {
+        localStorage.removeItem("rt_remember");
+      }
+
       showApp();
     } else {
       loginError.textContent = result.message;
