@@ -62,6 +62,22 @@ function validarLogin(user, pass) {
   return jsonResponse({ success: false, message: "Usuario o contrasena incorrectos" });
 }
 
+function formatearFecha(valor) {
+  if (!valor) return "";
+  if (valor instanceof Date) {
+    var d = valor.getUTCDate();
+    var m = valor.getUTCMonth() + 1;
+    var y = valor.getUTCFullYear();
+    return (d < 10 ? "0" + d : d) + "/" + (m < 10 ? "0" + m : m) + "/" + y;
+  }
+  var s = String(valor).split("T")[0];
+  var parts = s.split("-");
+  if (parts.length === 3) {
+    return parts[2] + "/" + parts[1] + "/" + parts[0];
+  }
+  return valor;
+}
+
 function getAllRegistros(currentUser) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
   var data = sheet.getDataRange().getValues();
@@ -71,10 +87,10 @@ function getAllRegistros(currentUser) {
     registros.push({
       nombre: data[i][0],
       territorio: data[i][1],
-      fechaInicio: data[i][2],
-      fechaFin: data[i][3],
+      fechaInicio: formatearFecha(data[i][2]),
+      fechaFin: formatearFecha(data[i][3]),
       id: data[i][4],
-      creado: data[i][5],
+      creado: formatearFecha(data[i][5]),
       creadoPor: data[i][6] || ""
     });
   }
@@ -93,10 +109,10 @@ function getOneRegistro(id) {
         data: {
           nombre: data[i][0],
           territorio: data[i][1],
-          fechaInicio: data[i][2],
-          fechaFin: data[i][3],
+          fechaInicio: formatearFecha(data[i][2]),
+          fechaFin: formatearFecha(data[i][3]),
           id: data[i][4],
-          creado: data[i][5],
+          creado: formatearFecha(data[i][5]),
           creadoPor: data[i][6] || ""
         }
       });

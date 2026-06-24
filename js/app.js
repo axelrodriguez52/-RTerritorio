@@ -3,7 +3,7 @@
 // PASO 3: Ejecutar como: Yo | Acceso: Cualquier persona
 // PASO 4: Copia la URL que te dé (empieza con https://script.google.com/macros/s/.../exec)
 // PASO 5: Pega esa URL aquí abajo
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwDiHY-0JqfgcpnSf52EVXxjBvVL2Vie-rLOXxjGlgwzUSUmxi9wQ-IvViwDC4cBoPO-Q/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwShFMlDdUvhTAzOqwM027iYqB2dQY1LecGmzEd3hgHGgxbpWxXHkLUsj9owEBzXT6sdw/exec";
 
 let registros = [];
 let idToDelete = null;
