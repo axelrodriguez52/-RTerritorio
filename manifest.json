@@ -4,8 +4,8 @@
   "description": "App para registrar territorios, sincronizada con Google Sheets",
   "start_url": "/-RTerritorio/",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#2563eb",
+  "background_color": "#F2F2F7",
+  "theme_color": "#F2F2F7",
   "orientation": "portrait-primary",
   "icons": [
     {

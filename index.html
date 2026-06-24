@@ -2,12 +2,12 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>RTerritorio - Registro de Territorios</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>RTerritorio</title>
   <meta name="description" content="App para registrar territorios, sincronizada con Google Sheets">
-  <meta name="theme-color" content="#2563eb">
+  <meta name="theme-color" content="#F2F2F7">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="RTerritorio">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -21,16 +21,16 @@
     <div class="login-card">
       <div class="login-header">
         <h1>RTerritorio</h1>
-        <p>Ingresa tus credenciales para acceder</p>
+        <p>Ingresa para continuar</p>
       </div>
       <form id="login-form">
         <div class="form-group">
           <label for="loginUser">Usuario</label>
-          <input type="text" id="loginUser" required placeholder="Tu usuario" autocomplete="username">
+          <input type="text" id="loginUser" required placeholder="usuario" autocomplete="username">
         </div>
         <div class="form-group">
           <label for="loginPass">Contraseña</label>
-          <input type="password" id="loginPass" required placeholder="Tu contraseña" autocomplete="current-password">
+          <input type="password" id="loginPass" required placeholder="contraseña" autocomplete="current-password">
         </div>
         <button type="submit" id="btnLogin" class="btn btn-primary btn-full">Ingresar</button>
         <p id="loginError" class="login-error" style="display:none;"></p>
@@ -41,7 +41,7 @@
   <div id="app-content" style="display:none;">
     <header>
       <div class="header-content">
-        <div>
+        <div class="header-left">
           <h1>RTerritorio</h1>
           <p>Registro de Territorios</p>
         </div>
@@ -58,19 +58,19 @@
         <form id="registro-form">
           <div class="form-grid">
             <div class="form-group">
-              <label for="nombre">Nombre *</label>
-              <input type="text" id="nombre" required placeholder="Ej: Juan Pérez">
+              <label for="nombre">Nombre</label>
+              <input type="text" id="nombre" required placeholder="Nombre completo">
             </div>
             <div class="form-group">
-              <label for="territorio">Territorio *</label>
-              <input type="text" id="territorio" required placeholder="Ej: Zona Norte">
+              <label for="territorio">Territorio</label>
+              <input type="text" id="territorio" required placeholder="Zona / Territorio">
             </div>
             <div class="form-group">
-              <label for="fechaInicio">Fecha de Inicio *</label>
+              <label for="fechaInicio">Fecha de Inicio</label>
               <input type="date" id="fechaInicio" required>
             </div>
             <div class="form-group">
-              <label for="fechaFin">Fecha de Finalización</label>
+              <label for="fechaFin">Fecha de Fin</label>
               <input type="date" id="fechaFin">
             </div>
           </div>
@@ -84,7 +84,7 @@
 
       <section id="table-section">
         <div class="table-header">
-          <input type="text" id="buscador" placeholder="Buscar por nombre o territorio...">
+          <input type="text" id="buscador" placeholder="Buscar...">
           <button id="btnExportar" class="btn btn-export">Exportar Excel</button>
         </div>
         <div class="table-container">
@@ -93,9 +93,9 @@
               <tr>
                 <th>Nombre</th>
                 <th>Territorio</th>
-                <th>Fecha Inicio</th>
-                <th>Fecha Fin</th>
-                <th>Acciones</th>
+                <th>Inicio</th>
+                <th>Fin</th>
+                <th></th>
               </tr>
             </thead>
             <tbody id="registros">
@@ -107,7 +107,7 @@
     </main>
 
     <footer>
-      <p>RTerritorio - Registros sincronizados con Google Sheets</p>
+      <p>Sincronizado con Google Sheets</p>
     </footer>
   </div>
 
@@ -115,7 +115,7 @@
 
   <div id="confirm-modal" class="modal" style="display:none;">
     <div class="modal-content">
-      <p>¿Estás seguro de que deseas eliminar este registro?</p>
+      <p>¿Eliminar este registro?</p>
       <div class="modal-actions">
         <button id="btnConfirmarEliminar" class="btn btn-danger">Eliminar</button>
         <button id="btnCancelarEliminar" class="btn btn-secondary">Cancelar</button>
@@ -123,8 +123,8 @@
     </div>
   </div>
 
-  <script src="js/app.js?v=5"></script>
-  <script src="js/export.js?v=5"></script>
+  <script src="js/app.js?v=6"></script>
+  <script src="js/export.js?v=6"></script>
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("service-worker.js").then(function(reg) {
