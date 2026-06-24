@@ -176,6 +176,14 @@ function getAllRegistros(currentUser) {
 
 function crearRegistro(data) {
   var sheet = getOrCreateSheet(SHEET_NAME);
+  var values = sheet.getDataRange().getValues();
+
+  for (var i = 1; i < values.length; i++) {
+    if (String(values[i][1]).trim().toLowerCase() === String(data.territorio).trim().toLowerCase() && String(values[i][2]).trim() === String(data.fechaInicio).trim()) {
+      return jsonResponse({ success: false, message: "Ya existe un registro para ese territorio en esa fecha" });
+    }
+  }
+
   var id = generateId();
   var now = new Date().toISOString().split("T")[0];
 
