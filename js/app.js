@@ -2,22 +2,9 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0blKDUCUDVZaP
 
 let registros = [];
 let idToDelete = null;
-let currentUser = null;
-let heartbeatInterval = null;
-let onlineInterval = null;
-
-const loginScreen = document.getElementById("login-screen");
-const appContent = document.getElementById("app-content");
-const loginForm = document.getElementById("login-form");
-const loginUser = document.getElementById("loginUser");
-const loginPass = document.getElementById("loginPass");
-const loginError = document.getElementById("loginError");
-const btnLogin = document.getElementById("btnLogin");
-const btnLogout = document.getElementById("btnLogout");
-const userDisplay = document.getElementById("userDisplay");
-const rememberMe = document.getElementById("rememberMe");
 
 const form = document.getElementById("registro-form");
+const nombreInput = document.getElementById("nombre");
 const territorioInput = document.getElementById("territorio");
 const fechaInicioInput = document.getElementById("fechaInicio");
 const fechaFinInput = document.getElementById("fechaFin");
@@ -33,171 +20,20 @@ const confirmModal = document.getElementById("confirm-modal");
 const btnConfirmarEliminar = document.getElementById("btnConfirmarEliminar");
 const btnCancelarEliminar = document.getElementById("btnCancelarEliminar");
 const notification = document.getElementById("notification");
-const onlineSection = document.getElementById("online-section");
-const onlineList = document.getElementById("online-list");
-
-var APP_VERSION = "v4";
 
 document.addEventListener("DOMContentLoaded", function() {
-  var savedVersion = localStorage.getItem("rt_version");
-  if (savedVersion !== APP_VERSION) {
-    localStorage.removeItem("rt_session");
-    localStorage.removeItem("rt_remember");
-    localStorage.setItem("rt_version", APP_VERSION);
-  }
-
-  var saved = localStorage.getItem("rt_session");
-  if (saved) {
-    currentUser = JSON.parse(saved);
-    if (!currentUser.rol) {
-      localStorage.removeItem("rt_session");
-      return;
-    }
-    showApp();
-    return;
-  }
-
-  var remembered = localStorage.getItem("rt_remember");
-  if (remembered) {
-    var creds = JSON.parse(remembered);
-    loginUser.value = creds.user || "";
-    loginPass.value = creds.pass || "";
-    rememberMe.checked = true;
-  }
-});
-
-loginForm.addEventListener("submit", function(e) {
-  e.preventDefault();
-  login();
-});
-
-btnLogin.addEventListener("click", login);
-
-btnLogout.addEventListener("click", function() {
-  fetch(APPS_SCRIPT_URL + "?action=logout&user=" + encodeURIComponent(currentUser.user));
-  clearInterval(heartbeatInterval);
-  clearInterval(onlineInterval);
-  localStorage.removeItem("rt_session");
-  localStorage.removeItem("rt_remember");
-  currentUser = null;
-  loginUser.value = "";
-  loginPass.value = "";
-  rememberMe.checked = false;
-  loginError.style.display = "none";
-  loginScreen.style.display = "flex";
-  appContent.style.display = "none";
-});
-
-async function login() {
-  var user = loginUser.value.trim();
-  var pass = loginPass.value;
-
-  if (!user || !pass) {
-    loginError.textContent = "Ingresa usuario y contraseña";
-    loginError.style.display = "block";
-    return;
-  }
-
-  btnLogin.disabled = true;
-  btnLogin.textContent = "Ingresando...";
-  loginError.style.display = "none";
-
-  try {
-    var response = await fetch(APPS_SCRIPT_URL + "?action=login&user=" + encodeURIComponent(user) + "&pass=" + encodeURIComponent(pass));
-    var result = await response.json();
-
-    if (result.success) {
-      currentUser = { user: result.user, nombre: result.nombre, rol: result.rol };
-      localStorage.setItem("rt_session", JSON.stringify(currentUser));
-
-      if (rememberMe.checked) {
-        localStorage.setItem("rt_remember", JSON.stringify({ user: user, pass: pass }));
-      } else {
-        localStorage.removeItem("rt_remember");
-      }
-
-      showApp();
-    } else {
-      loginError.textContent = result.message;
-      loginError.style.display = "block";
-    }
-  } catch (error) {
-    loginError.textContent = "Error de conexión. Verifica la URL.";
-    loginError.style.display = "block";
-  } finally {
-    btnLogin.disabled = false;
-    btnLogin.textContent = "Ingresar";
-  }
-}
-
-function showApp() {
-  loginScreen.style.display = "none";
-  appContent.style.display = "block";
-  userDisplay.textContent = (currentUser.nombre || currentUser.user) + " (" + currentUser.rol + ")";
-
-  if (isAdmin()) {
-    btnExportar.style.display = "inline-block";
-    onlineSection.style.display = "block";
-    cargarOnline();
-    onlineInterval = setInterval(cargarOnline, 10000);
-  } else {
-    btnExportar.style.display = "none";
-    onlineSection.style.display = "none";
-  }
-
-  iniciarHeartbeat();
+  btnExportar.style.display = "inline-block";
   cargarRegistros();
-}
-
-function iniciarHeartbeat() {
-  heartbeatInterval = setInterval(function() {
-    fetch(APPS_SCRIPT_URL + "?action=heartbeat&user=" + encodeURIComponent(currentUser.user));
-  }, 30000);
-}
-
-async function cargarOnline() {
-  try {
-    var response = await fetch(APPS_SCRIPT_URL + "?action=getOnline");
-    var result = await response.json();
-    if (result.success) {
-      renderOnlineUsers(result.data);
-    }
-  } catch (e) {}
-}
-
-function renderOnlineUsers(users) {
-  onlineList.innerHTML = "";
-  if (users.length === 0) {
-    onlineList.innerHTML = '<p class="online-empty">No hay usuarios conectados</p>';
-    return;
-  }
-  users.forEach(function(u) {
-    var div = document.createElement("div");
-    div.className = "online-user";
-    div.innerHTML = '<span class="online-dot"></span>' +
-      '<span class="online-name">' + escapeHtml(u.nombre) + '</span>' +
-      '<span class="online-role">' + escapeHtml(u.rol) + '</span>';
-    onlineList.appendChild(div);
-  });
-}
-
-function isAdmin() {
-  return currentUser && currentUser.rol === "admin";
-}
-
-function canEdit(registro) {
-  return isAdmin() || registro.creadoPor === currentUser.user;
-}
+});
 
 form.addEventListener("submit", function(e) {
   e.preventDefault();
 
   var datos = {
-    nombre: currentUser.nombre,
+    nombre: nombreInput.value.trim(),
     territorio: territorioInput.value.trim(),
     fechaInicio: fechaInicioInput.value,
-    fechaFin: fechaFinInput.value,
-    currentUser: currentUser.user
+    fechaFin: fechaFinInput.value
   };
 
   if (!datos.nombre || !datos.territorio || !datos.fechaInicio) {
@@ -216,10 +52,6 @@ form.addEventListener("submit", function(e) {
 btnCancelar.addEventListener("click", cancelarEdicion);
 
 btnExportar.addEventListener("click", function() {
-  if (!isAdmin()) {
-    showNotification("Solo el administrador puede exportar", "error");
-    return;
-  }
   if (registros.length === 0) {
     showNotification("No hay registros para exportar", "error");
     return;
@@ -258,7 +90,7 @@ confirmModal.addEventListener("click", function(e) {
 
 async function cargarRegistros() {
   try {
-    var response = await fetch(APPS_SCRIPT_URL + "?action=getAll&user=" + encodeURIComponent(currentUser.user));
+    var response = await fetch(APPS_SCRIPT_URL + "?action=getAll");
     var result = await response.json();
 
     if (result.success) {
@@ -291,7 +123,7 @@ async function agregarRegistro(datos) {
       limpiarFormulario();
       cargarRegistros();
     } else {
-      showNotification("Error al crear registro", "error");
+      showNotification(result.message || "Error al crear registro", "error");
     }
   } catch (error) {
     showNotification("Error de conexión", "error");
@@ -335,11 +167,7 @@ function prepararEdicion(id) {
   var registro = registros.find(function(r) { return r.id === id; });
   if (!registro) return;
 
-  if (!canEdit(registro)) {
-    showNotification("No puedes editar registros de otros usuarios", "error");
-    return;
-  }
-
+  nombreInput.value = registro.nombre;
   territorioInput.value = registro.territorio;
   fechaInicioInput.value = registro.fechaInicio;
   fechaFinInput.value = registro.fechaFin || "";
@@ -365,14 +193,6 @@ function limpiarFormulario() {
 }
 
 function confirmarEliminar(id) {
-  var registro = registros.find(function(r) { return r.id === id; });
-  if (!registro) return;
-
-  if (!canEdit(registro)) {
-    showNotification("No puedes eliminar registros de otros usuarios", "error");
-    return;
-  }
-
   idToDelete = id;
   confirmModal.style.display = "flex";
 }
@@ -382,7 +202,7 @@ async function ejecutarEliminar(id) {
     var response = await fetch(APPS_SCRIPT_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ action: "delete", id: id, currentUser: currentUser.user })
+      body: JSON.stringify({ action: "delete", id: id })
     });
 
     var result = await response.json();
@@ -410,7 +230,6 @@ function renderizarTabla(data) {
   noRecords.style.display = "none";
 
   data.forEach(function(registro) {
-    var editable = canEdit(registro);
     var row = document.createElement("tr");
     row.innerHTML =
       "<td>" + escapeHtml(registro.nombre) + "</td>" +
@@ -418,10 +237,8 @@ function renderizarTabla(data) {
       "<td>" + formatoFecha(registro.fechaInicio) + "</td>" +
       "<td>" + (registro.fechaFin ? formatoFecha(registro.fechaFin) : "-") + "</td>" +
       '<td class="actions">' +
-        (editable
-          ? '<button class="btn-icon edit" onclick="prepararEdicion(\'' + registro.id + '\')" title="Editar">&#9998;</button>' +
-            '<button class="btn-icon delete" onclick="confirmarEliminar(\'' + registro.id + '\')" title="Eliminar">&#128465;</button>'
-          : '<span class="text-lock" title="Registro de otro usuario">&#128274;</span>') +
+        '<button class="btn-icon edit" onclick="prepararEdicion(\'' + registro.id + '\')" title="Editar">&#9998;</button>' +
+        '<button class="btn-icon delete" onclick="confirmarEliminar(\'' + registro.id + '\')" title="Eliminar">&#128465;</button>' +
       "</td>";
     registrosBody.appendChild(row);
   });

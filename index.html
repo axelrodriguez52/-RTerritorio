@@ -17,41 +17,12 @@
 </head>
 <body>
 
-  <div id="login-screen" class="login-screen">
-    <div class="login-card">
-      <div class="login-header">
-        <h1>RTerritorio</h1>
-        <p>Ingresa para continuar</p>
-      </div>
-      <form id="login-form">
-        <div class="form-group">
-          <label for="loginUser">Usuario</label>
-          <input type="text" id="loginUser" required placeholder="usuario" autocomplete="username">
-        </div>
-        <div class="form-group">
-          <label for="loginPass">Contraseña</label>
-          <input type="password" id="loginPass" required placeholder="contraseña" autocomplete="current-password">
-        </div>
-        <label class="remember-label">
-          <input type="checkbox" id="rememberMe">
-          <span>Recordar credenciales</span>
-        </label>
-        <button type="submit" id="btnLogin" class="btn btn-primary btn-full">Ingresar</button>
-        <p id="loginError" class="login-error" style="display:none;"></p>
-      </form>
-    </div>
-  </div>
-
-  <div id="app-content" style="display:none;">
+  <div id="app-content">
     <header>
       <div class="header-content">
         <div class="header-left">
           <h1>RTerritorio</h1>
           <p>Registro de Territorios</p>
-        </div>
-        <div class="header-right">
-          <span id="userDisplay" class="user-display"></span>
-          <button id="btnLogout" class="btn btn-logout">Salir</button>
         </div>
       </div>
     </header>
@@ -61,6 +32,10 @@
         <h2 id="form-title">Nuevo Registro</h2>
         <form id="registro-form">
           <div class="form-grid">
+            <div class="form-group">
+              <label for="nombre">Nombre</label>
+              <input type="text" id="nombre" required placeholder="Nombre completo">
+            </div>
             <div class="form-group">
               <label for="territorio">Territorio</label>
               <input type="text" id="territorio" required placeholder="Zona / Territorio">
@@ -104,16 +79,6 @@
         </div>
         <p id="no-records" class="no-records" style="display:none;">No hay registros</p>
       </section>
-
-      <section id="online-section" style="display:none;">
-        <div class="online-card">
-          <div class="online-header">
-            <span class="online-title">Usuarios conectados</span>
-            <span class="online-count" id="online-count">0</span>
-          </div>
-          <div id="online-list"></div>
-        </div>
-      </section>
     </main>
 
     <footer>
@@ -133,8 +98,8 @@
     </div>
   </div>
 
-  <script src="js/app.js?v=7"></script>
-  <script src="js/export.js?v=7"></script>
+  <script src="js/app.js?v=8"></script>
+  <script src="js/export.js?v=8"></script>
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("service-worker.js").then(function(reg) {
