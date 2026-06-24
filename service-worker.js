@@ -1,4 +1,4 @@
-var CACHE_NAME = "rterritorio-v7";
+var CACHE_NAME = "rterritorio-v8";
 
 self.addEventListener("install", function(event) {
   self.skipWaiting();
