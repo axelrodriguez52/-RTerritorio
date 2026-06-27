@@ -87,6 +87,27 @@ header {
   border-radius: 20px;
 }
 
+.offline-banner {
+  background: var(--danger);
+  color: white;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.sync-badge {
+  font-size: 1.125rem;
+  color: #FF9500;
+  animation: spin 2s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .btn-logout {
   background: var(--danger);
   color: white;

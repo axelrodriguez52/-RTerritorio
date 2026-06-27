@@ -16,7 +16,6 @@ const formTitle = document.getElementById("form-title");
 const registrosBody = document.getElementById("registros");
 const noRecords = document.getElementById("no-records");
 const buscador = document.getElementById("buscador");
-const btnExportar = document.getElementById("btnExportar");
 const confirmModal = document.getElementById("confirm-modal");
 const btnConfirmarEliminar = document.getElementById("btnConfirmarEliminar");
 const btnCancelarEliminar = document.getElementById("btnCancelarEliminar");
@@ -25,14 +24,75 @@ const btnConfirmarEditar = document.getElementById("btnConfirmarEditar");
 const btnCancelarEditar = document.getElementById("btnCancelarEditar");
 const notification = document.getElementById("notification");
 
+function isOnline() {
+  return navigator.onLine;
+}
+
+function getPending() {
+  return JSON.parse(localStorage.getItem("rt_pending") || "[]");
+}
+
+function savePending(list) {
+  localStorage.setItem("rt_pending", JSON.stringify(list));
+}
+
+function showOfflineBanner() {
+  var banner = document.getElementById("offline-banner");
+  if (banner) banner.style.display = "block";
+}
+
+function hideOfflineBanner() {
+  var banner = document.getElementById("offline-banner");
+  if (banner) banner.style.display = "none";
+}
+
 document.addEventListener("DOMContentLoaded", function() {
+  if (!isOnline()) showOfflineBanner();
   cargarRegistros();
 });
+
+window.addEventListener("online", function() {
+  hideOfflineBanner();
+  showNotification("Conexion restaurada", "success");
+  syncPending();
+});
+
+window.addEventListener("offline", function() {
+  showOfflineBanner();
+  showNotification("Sin conexion — los registros se guardaran localmente", "error");
+});
+
+async function syncPending() {
+  var pending = getPending();
+  if (pending.length === 0) return;
+
+  var synced = 0;
+  for (var i = 0; i < pending.length; i++) {
+    try {
+      var response = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(pending[i])
+      });
+      var result = await response.json();
+      if (result.success) synced++;
+    } catch (e) {
+      break;
+    }
+  }
+
+  if (synced > 0) {
+    savePending(pending.slice(synced));
+    showNotification(synced + " registro(s) sincronizado(s)", "success");
+    cargarRegistros();
+  }
+}
 
 form.addEventListener("submit", function(e) {
   e.preventDefault();
 
   var datos = {
+    action: "create",
     nombre: nombreInput.value.trim(),
     territorio: territorioInput.value.trim(),
     fechaInicio: fechaInicioInput.value,
@@ -45,6 +105,7 @@ form.addEventListener("submit", function(e) {
   }
 
   if (editIdInput.value) {
+    datos.action = "update";
     datos.id = editIdInput.value;
     actualizarRegistro(datos);
   } else {
@@ -117,23 +178,61 @@ editModal.addEventListener("click", function(e) {
 });
 
 async function cargarRegistros() {
+  if (!isOnline()) {
+    var cached = localStorage.getItem("rt_registros");
+    if (cached) {
+      registros = JSON.parse(cached);
+      renderizarTabla(registros);
+    } else {
+      showNotification("Sin conexion — sin datos guardados", "error");
+    }
+    return;
+  }
+
   try {
     var response = await fetch(APPS_SCRIPT_URL + "?action=getAll");
     var result = await response.json();
 
     if (result.success) {
       registros = result.data;
+      localStorage.setItem("rt_registros", JSON.stringify(registros));
       renderizarTabla(registros);
     } else {
       showNotification("Error al cargar registros", "error");
     }
   } catch (error) {
-    showNotification("Error de conexión", "error");
-    console.error(error);
+    var cached = localStorage.getItem("rt_registros");
+    if (cached) {
+      registros = JSON.parse(cached);
+      renderizarTabla(registros);
+      showNotification("Usando datos guardados localmente", "error");
+    } else {
+      showNotification("Error de conexion", "error");
+    }
   }
 }
 
 async function agregarRegistro(datos) {
+  if (!isOnline()) {
+    var pending = getPending();
+    pending.push(datos);
+    savePending(pending);
+
+    var temp = {
+      id: "local_" + Date.now(),
+      nombre: datos.nombre,
+      territorio: datos.territorio,
+      fechaInicio: datos.fechaInicio,
+      fechaFin: datos.fechaFin || ""
+    };
+    registros.push(temp);
+    renderizarTabla(registros);
+
+    showNotification("Guardado localmente — se sincroniza cuando haya internet", "success");
+    limpiarFormulario();
+    return;
+  }
+
   try {
     btnGuardar.disabled = true;
     btnGuardar.textContent = "Guardando...";
@@ -141,7 +240,7 @@ async function agregarRegistro(datos) {
     var response = await fetch(APPS_SCRIPT_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ action: "create", ...datos })
+      body: JSON.stringify(datos)
     });
 
     var result = await response.json();
@@ -154,8 +253,22 @@ async function agregarRegistro(datos) {
       showNotification(result.message || "Error al crear registro", "error");
     }
   } catch (error) {
-    showNotification("Error de conexión", "error");
-    console.error(error);
+    var pending = getPending();
+    pending.push(datos);
+    savePending(pending);
+
+    var temp = {
+      id: "local_" + Date.now(),
+      nombre: datos.nombre,
+      territorio: datos.territorio,
+      fechaInicio: datos.fechaInicio,
+      fechaFin: datos.fechaFin || ""
+    };
+    registros.push(temp);
+    renderizarTabla(registros);
+
+    showNotification("Guardado localmente — se sincroniza cuando haya internet", "success");
+    limpiarFormulario();
   } finally {
     btnGuardar.disabled = false;
     btnGuardar.textContent = "Registrar";
@@ -163,6 +276,11 @@ async function agregarRegistro(datos) {
 }
 
 async function actualizarRegistro(datos) {
+  if (!isOnline()) {
+    showNotification("Sin conexion — no se puede editar", "error");
+    return;
+  }
+
   try {
     btnGuardar.disabled = true;
     btnGuardar.textContent = "Actualizando...";
@@ -170,7 +288,7 @@ async function actualizarRegistro(datos) {
     var response = await fetch(APPS_SCRIPT_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ action: "update", ...datos })
+      body: JSON.stringify(datos)
     });
 
     var result = await response.json();
@@ -183,8 +301,7 @@ async function actualizarRegistro(datos) {
       showNotification("Error al actualizar registro", "error");
     }
   } catch (error) {
-    showNotification("Error de conexión", "error");
-    console.error(error);
+    showNotification("Error de conexion", "error");
   } finally {
     btnGuardar.disabled = false;
     btnGuardar.textContent = "Registrar";
@@ -217,6 +334,11 @@ function confirmarEliminar(id) {
 }
 
 async function ejecutarEliminar(id) {
+  if (!isOnline()) {
+    showNotification("Sin conexion — no se puede eliminar", "error");
+    return;
+  }
+
   try {
     var response = await fetch(APPS_SCRIPT_URL, {
       method: "POST",
@@ -233,8 +355,7 @@ async function ejecutarEliminar(id) {
       showNotification("Error al eliminar registro", "error");
     }
   } catch (error) {
-    showNotification("Error de conexión", "error");
-    console.error(error);
+    showNotification("Error de conexion", "error");
   }
 }
 
@@ -249,6 +370,7 @@ function renderizarTabla(data) {
   noRecords.style.display = "none";
 
   data.forEach(function(registro) {
+    var isLocal = String(registro.id).startsWith("local_");
     var row = document.createElement("tr");
     row.innerHTML =
       "<td>" + escapeHtml(registro.nombre) + "</td>" +
@@ -256,8 +378,10 @@ function renderizarTabla(data) {
       "<td>" + formatoFecha(registro.fechaInicio) + "</td>" +
       "<td>" + (registro.fechaFin ? formatoFecha(registro.fechaFin) : "-") + "</td>" +
       '<td class="actions">' +
-        '<button class="btn-icon edit" onclick="prepararEdicion(\'' + registro.id + '\')" title="Editar">&#9998;</button>' +
-        '<button class="btn-icon delete" onclick="confirmarEliminar(\'' + registro.id + '\')" title="Eliminar">&#128465;</button>' +
+        (isLocal
+          ? '<span class="sync-badge" title="Pendiente de sincronizar">&#9851;</span>'
+          : '<button class="btn-icon edit" onclick="prepararEdicion(\'' + registro.id + '\')" title="Editar">&#9998;</button>' +
+            '<button class="btn-icon delete" onclick="confirmarEliminar(\'' + registro.id + '\')" title="Eliminar">&#128465;</button>') +
       "</td>";
     registrosBody.appendChild(row);
   });
