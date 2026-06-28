@@ -100,6 +100,11 @@
 
   <div id="notification" class="notification"></div>
 
+  <div id="update-banner" class="update-banner" style="display:none;">
+    <span>Nueva version disponible</span>
+    <button id="btnUpdate" class="btn btn-primary btn-update">Actualizar</button>
+  </div>
+
   <div id="confirm-modal" class="modal" style="display:none;">
     <div class="modal-content">
       <p>¿Eliminar este registro?</p>
@@ -125,9 +130,32 @@
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("service-worker.js").then(function(reg) {
-        reg.update();
+        reg.addEventListener("updatefound", function() {
+          var newWorker = reg.installing;
+          newWorker.addEventListener("statechange", function() {
+            if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+              document.getElementById("update-banner").style.display = "flex";
+            }
+          });
+        });
+      });
+
+      var refreshing = false;
+      navigator.serviceWorker.addEventListener("controllerchange", function() {
+        if (!refreshing) {
+          refreshing = true;
+          window.location.reload();
+        }
       });
     }
+
+    document.getElementById("btnUpdate").addEventListener("click", function() {
+      navigator.serviceWorker.getRegistration().then(function(reg) {
+        if (reg && reg.waiting) {
+          reg.waiting.postMessage({ type: "SKIP_WAITING" });
+        }
+      });
+    });
   </script>
 </body>
 </html>

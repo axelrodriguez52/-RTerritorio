@@ -1,4 +1,4 @@
-var CACHE_NAME = "rterritorio-v9";
+var CACHE_NAME = "rterritorio-v10";
 var ASSETS = [
   "./",
   "./index.html",
@@ -33,12 +33,24 @@ self.addEventListener("activate", function(event) {
   self.clients.claim();
 });
 
+self.addEventListener("message", function(event) {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener("fetch", function(event) {
   if (event.request.url.includes("script.google.com")) return;
 
   event.respondWith(
-    caches.match(event.request).then(function(cached) {
-      return cached || fetch(event.request);
+    fetch(event.request).then(function(response) {
+      var clone = response.clone();
+      caches.open(CACHE_NAME).then(function(cache) {
+        cache.put(event.request, clone);
+      });
+      return response;
+    }).catch(function() {
+      return caches.match(event.request);
     })
   );
 });

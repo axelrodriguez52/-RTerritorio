@@ -148,6 +148,35 @@ header {
   text-decoration: underline;
 }
 
+.update-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  z-index: 998;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.btn-update {
+  padding: 0.375rem 0.875rem;
+  font-size: 0.8125rem;
+  background: white;
+  color: var(--primary);
+  border-radius: 8px;
+  font-weight: 700;
+}
+
 .btn-logout {
   background: var(--danger);
   color: white;
