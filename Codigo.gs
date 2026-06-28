@@ -192,13 +192,9 @@ function crearRegistro(data) {
 function actualizarRegistro(data) {
   var sheet = getOrCreateSheet(SHEET_NAME);
   var values = sheet.getDataRange().getValues();
-  var userRol = getUserRol(data.currentUser);
 
   for (var i = 1; i < values.length; i++) {
-    if (values[i][4] === data.id) {
-      if (userRol !== "admin" && values[i][6] !== data.currentUser) {
-        return jsonResponse({ success: false, message: "No tienes permiso para editar este registro" });
-      }
+    if (String(values[i][4]).trim() === String(data.id).trim()) {
       sheet.getRange(i + 1, 1).setValue(data.nombre);
       sheet.getRange(i + 1, 2).setValue(data.territorio);
       sheet.getRange(i + 1, 3).setValue(data.fechaInicio);
@@ -213,13 +209,9 @@ function actualizarRegistro(data) {
 function eliminarRegistro(id, currentUser) {
   var sheet = getOrCreateSheet(SHEET_NAME);
   var data = sheet.getDataRange().getValues();
-  var userRol = getUserRol(currentUser);
 
   for (var i = 1; i < data.length; i++) {
-    if (data[i][4] === id) {
-      if (userRol !== "admin" && data[i][6] !== currentUser) {
-        return jsonResponse({ success: false, message: "No tienes permiso para eliminar este registro" });
-      }
+    if (String(data[i][4]).trim() === String(id).trim()) {
       sheet.deleteRow(i + 1);
       return jsonResponse({ success: true, message: "Registro eliminado" });
     }
