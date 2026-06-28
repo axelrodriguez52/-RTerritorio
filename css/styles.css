@@ -108,6 +108,46 @@ header {
   to { transform: rotate(360deg); }
 }
 
+.gps-group {
+  margin-top: 0.5rem;
+}
+
+.gps-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.gps-input {
+  flex: 1;
+}
+
+.btn-gps {
+  background: var(--success);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0 1rem;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-gps:hover {
+  background: var(--success-dark);
+}
+
+.gps-link {
+  color: var(--primary);
+  font-size: 0.75rem;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.gps-link:hover {
+  text-decoration: underline;
+}
+
 .btn-logout {
   background: var(--danger);
   color: white;

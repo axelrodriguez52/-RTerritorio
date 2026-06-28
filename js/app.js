@@ -3,6 +3,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzmEP8_MuY-gHWy
 let registros = [];
 let idToDelete = null;
 let idToEdit = null;
+let currentGPS = null;
 
 const form = document.getElementById("registro-form");
 const nombreInput = document.getElementById("nombre");
@@ -23,6 +24,8 @@ const editModal = document.getElementById("edit-modal");
 const btnConfirmarEditar = document.getElementById("btnConfirmarEditar");
 const btnCancelarEditar = document.getElementById("btnCancelarEditar");
 const notification = document.getElementById("notification");
+const gpsCoords = document.getElementById("gpsCoords");
+const btnGPS = document.getElementById("btnGPS");
 
 function isOnline() {
   return navigator.onLine;
@@ -51,6 +54,35 @@ document.addEventListener("DOMContentLoaded", function() {
   cargarRegistros();
   verificarNotificacion();
   programarNotificacion();
+});
+
+btnGPS.addEventListener("click", function() {
+  if (!navigator.geolocation) {
+    showNotification("Tu navegador no soporta GPS", "error");
+    return;
+  }
+
+  btnGPS.textContent = "...";
+  btnGPS.disabled = true;
+
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      currentGPS = {
+        lat: pos.coords.latitude.toFixed(6),
+        lng: pos.coords.longitude.toFixed(6)
+      };
+      gpsCoords.value = currentGPS.lat + ", " + currentGPS.lng;
+      btnGPS.innerHTML = "&#128205;";
+      btnGPS.disabled = false;
+      showNotification("Ubicacion capturada", "success");
+    },
+    function(err) {
+      btnGPS.innerHTML = "&#128205;";
+      btnGPS.disabled = false;
+      showNotification("No se pudo obtener la ubicacion", "error");
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
 });
 
 window.addEventListener("online", function() {
@@ -98,7 +130,8 @@ form.addEventListener("submit", function(e) {
     nombre: nombreInput.value.trim(),
     territorio: territorioInput.value.trim(),
     fechaInicio: fechaInicioInput.value,
-    fechaFin: fechaFinInput.value
+    fechaFin: fechaFinInput.value,
+    gps: currentGPS ? currentGPS.lat + ", " + currentGPS.lng : ""
   };
 
   if (!datos.nombre || !datos.territorio || !datos.fechaInicio) {
@@ -328,6 +361,8 @@ function limpiarFormulario() {
   formTitle.textContent = "Nuevo Registro";
   btnGuardar.textContent = "Registrar";
   btnCancelar.style.display = "none";
+  currentGPS = null;
+  gpsCoords.value = "";
 }
 
 function confirmarEliminar(id) {
@@ -373,12 +408,16 @@ function renderizarTabla(data) {
 
   data.forEach(function(registro) {
     var isLocal = String(registro.id).startsWith("local_");
+    var gpsHtml = registro.gps
+      ? '<a class="gps-link" href="https://www.google.com/maps?q=' + registro.gps + '" target="_blank">Ver mapa</a>'
+      : '<span style="color:var(--text-tertiary)">-</span>';
     var row = document.createElement("tr");
     row.innerHTML =
       "<td>" + escapeHtml(registro.nombre) + "</td>" +
       "<td>" + escapeHtml(registro.territorio) + "</td>" +
       "<td>" + formatoFecha(registro.fechaInicio) + "</td>" +
       "<td>" + (registro.fechaFin ? formatoFecha(registro.fechaFin) : "-") + "</td>" +
+      "<td>" + gpsHtml + "</td>" +
       '<td class="actions">' +
         (isLocal
           ? '<span class="sync-badge" title="Pendiente de sincronizar">&#9851;</span>'

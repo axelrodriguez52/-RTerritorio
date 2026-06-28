@@ -164,7 +164,7 @@ function getAllRegistros(currentUser) {
       fechaFin: formatearFecha(data[i][3]),
       id: data[i][4],
       creado: formatearFecha(data[i][5]),
-      creadoPor: data[i][6] || ""
+      gps: data[i][6] || ""
     });
   }
 
@@ -184,7 +184,7 @@ function crearRegistro(data) {
   var id = generateId();
   var now = new Date().toISOString().split("T")[0];
 
-  sheet.appendRow([data.nombre, data.territorio, data.fechaInicio, data.fechaFin || "", id, now, data.currentUser || ""]);
+  sheet.appendRow([data.nombre, data.territorio, data.fechaInicio, data.fechaFin || "", id, now, data.gps || ""]);
 
   return jsonResponse({ success: true, id: id, message: "Registro creado" });
 }
