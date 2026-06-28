@@ -33,46 +33,97 @@
     </div>
 
     <main>
-      <section id="form-section">
-        <h2 id="form-title">Nuevo Registro</h2>
-        <form id="registro-form">
+      <section id="wizard-section">
+        <div class="progress-bar">
+          <div class="progress-step active" id="progress-1">1</div>
+          <div class="progress-line" id="line-1"></div>
+          <div class="progress-step" id="progress-2">2</div>
+          <div class="progress-line" id="line-2"></div>
+          <div class="progress-step" id="progress-3">3</div>
+        </div>
+
+        <div id="step-1" class="wizard-step">
+          <h2>Nombre del publicador</h2>
+          <div class="form-group">
+            <input type="text" id="step-nombre" required placeholder="Escribe tu nombre">
+          </div>
+          <button type="button" id="btn-step1-next" class="btn btn-primary btn-full">Siguiente</button>
+        </div>
+
+        <div id="step-2" class="wizard-step" style="display:none;">
+          <h2>Territorio</h2>
+          <div class="form-group">
+            <input type="text" id="step-territorio" placeholder="Nombre del territorio">
+          </div>
+          <div class="gps-divider">
+            <span>o</span>
+          </div>
+          <button type="button" id="btn-step2-gps" class="btn btn-gps-full">
+            &#128205; Usar ubicacion GPS actual
+          </button>
+          <div id="step2-gps-status" class="gps-status" style="display:none;"></div>
+          <div class="form-actions-step">
+            <button type="button" id="btn-step2-back" class="btn btn-secondary">Atras</button>
+            <button type="button" id="btn-step2-next" class="btn btn-primary">Siguiente</button>
+          </div>
+        </div>
+
+        <div id="step-3" class="wizard-step" style="display:none;">
+          <h2>Fechas</h2>
           <div class="form-grid">
             <div class="form-group">
-              <label for="nombre">Nombre</label>
-              <input type="text" id="nombre" required placeholder="Nombre completo">
+              <label for="step-fechaInicio">Fecha de Inicio</label>
+              <input type="date" id="step-fechaInicio" required>
             </div>
             <div class="form-group">
-              <label for="territorio">Territorio</label>
-              <input type="text" id="territorio" required placeholder="Zona / Territorio">
-            </div>
-            <div class="form-group">
-              <label for="fechaInicio">Fecha de Inicio</label>
-              <input type="date" id="fechaInicio" required>
-            </div>
-            <div class="form-group">
-              <label for="fechaFin">Fecha de Fin</label>
-              <input type="date" id="fechaFin">
+              <label for="step-fechaFin">Fecha de Fin</label>
+              <input type="date" id="step-fechaFin">
             </div>
           </div>
-          <div class="form-group gps-group">
-            <label>Posicion GPS</label>
-            <div class="gps-row">
-              <input type="text" id="gpsCoords" readonly placeholder="Sin ubicacion" class="gps-input">
-              <button type="button" id="btnGPS" class="btn btn-gps" title="Obtener ubicacion">&#128205;</button>
-            </div>
+          <div class="form-actions-step">
+            <button type="button" id="btn-step3-back" class="btn btn-secondary">Atras</button>
+            <button type="button" id="btn-step3-submit" class="btn btn-primary">Registrar</button>
           </div>
-          <div class="form-actions">
-            <button type="submit" id="btnGuardar" class="btn btn-primary">Registrar</button>
-            <button type="button" id="btnCancelar" class="btn btn-secondary" style="display:none;">Cancelar</button>
-          </div>
-          <input type="hidden" id="editId" value="">
-        </form>
+          <button type="button" id="btn-cancelar" class="btn btn-cancel-full">Cancelar</button>
+        </div>
       </section>
 
-      <section id="table-section">
+      <section id="edit-section" style="display:none;">
+        <h2>Editar Registro</h2>
+        <div class="form-group">
+          <label for="edit-nombre">Nombre</label>
+          <input type="text" id="edit-nombre" required>
+        </div>
+        <div class="form-group">
+          <label for="edit-territorio">Territorio</label>
+          <input type="text" id="edit-territorio" required>
+        </div>
+        <div class="form-group gps-group">
+          <label>Posicion GPS</label>
+          <div class="gps-row">
+            <input type="text" id="edit-gps" readonly placeholder="Sin ubicacion" class="gps-input">
+            <button type="button" id="btn-edit-gps" class="btn btn-gps" title="Obtener ubicacion">&#128205;</button>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="edit-fechaInicio">Fecha de Inicio</label>
+            <input type="date" id="edit-fechaInicio" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-fechaFin">Fecha de Fin</label>
+            <input type="date" id="edit-fechaFin">
+          </div>
+        </div>
+        <div class="form-actions-step">
+          <button type="button" id="btn-edit-cancel" class="btn btn-secondary">Cancelar</button>
+          <button type="button" id="btn-edit-save" class="btn btn-primary">Guardar</button>
+        </div>
+      </section>
+
+      <section id="table-section" style="display:none;">
         <div class="table-header">
           <input type="text" id="buscador" placeholder="Buscar...">
-          <button id="btnExportar" class="btn btn-export" style="display:none;">Exportar Excel</button>
         </div>
         <div class="table-container">
           <table>
@@ -91,6 +142,7 @@
           </table>
         </div>
         <p id="no-records" class="no-records" style="display:none;">No hay registros</p>
+        <button type="button" id="btn-nuevo" class="btn btn-primary btn-full btn-nuevo">+ Nuevo Registro</button>
       </section>
     </main>
 
@@ -116,16 +168,6 @@
     </div>
   </div>
 
-  <div id="edit-modal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <p>¿Editar este registro?</p>
-      <div class="modal-actions">
-        <button id="btnConfirmarEditar" class="btn btn-primary">Editar</button>
-        <button id="btnCancelarEditar" class="btn btn-secondary">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
   <script src="js/app.js"></script>
   <script src="js/export.js"></script>
   <script>
@@ -139,6 +181,7 @@
     });
 
     if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("OneSignalSDKWorker.js");
       navigator.serviceWorker.register("service-worker.js").then(function(reg) {
         reg.addEventListener("updatefound", function() {
           var newWorker = reg.installing;

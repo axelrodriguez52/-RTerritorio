@@ -748,3 +748,137 @@ footer {
     align-items: center;
   }
 }
+
+.progress-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.progress-step {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--fill);
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.progress-step.active {
+  background: var(--primary);
+  color: white;
+}
+
+.progress-step.completed {
+  background: var(--success);
+  color: white;
+}
+
+.progress-line {
+  width: 40px;
+  height: 3px;
+  background: var(--fill);
+  border-radius: 2px;
+  transition: background 0.3s ease;
+}
+
+.progress-line.completed {
+  background: var(--success);
+}
+
+.wizard-step {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 1.5rem;
+}
+
+.wizard-step h2 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.gps-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  color: var(--text-tertiary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.gps-divider::before,
+.gps-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--fill);
+}
+
+.btn-gps-full {
+  width: 100%;
+  padding: 0.875rem;
+  background: var(--bg);
+  color: var(--text);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-gps-full:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.gps-status {
+  margin-top: 0.75rem;
+  padding: 0.625rem;
+  background: #E8F5E9;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  color: var(--success-dark);
+  font-weight: 600;
+  text-align: center;
+}
+
+.form-actions-step {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.form-actions-step .btn {
+  flex: 1;
+  padding: 0.875rem;
+  font-size: 0.9375rem;
+  border-radius: var(--radius);
+}
+
+.btn-cancel-full {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: none;
+  color: var(--text-tertiary);
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-nuevo {
+  margin-top: 1rem;
+}
