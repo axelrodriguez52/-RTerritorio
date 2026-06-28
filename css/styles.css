@@ -177,6 +177,19 @@ header {
   font-weight: 700;
 }
 
+.btn-test-notif {
+  display: block;
+  margin: 1rem auto 0;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  background: var(--fill);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
 .btn-logout {
   background: var(--danger);
   color: white;

@@ -26,6 +26,7 @@ const btnCancelarEditar = document.getElementById("btnCancelarEditar");
 const notification = document.getElementById("notification");
 const gpsCoords = document.getElementById("gpsCoords");
 const btnGPS = document.getElementById("btnGPS");
+const btnTestNotif = document.getElementById("btnTestNotif");
 
 function isOnline() {
   return navigator.onLine;
@@ -83,6 +84,10 @@ btnGPS.addEventListener("click", function() {
     },
     { enableHighAccuracy: true, timeout: 10000 }
   );
+});
+
+btnTestNotif.addEventListener("click", function() {
+  mostrarNotificacion("Esta es una notificacion de prueba de RTerritorio");
 });
 
 window.addEventListener("online", function() {
