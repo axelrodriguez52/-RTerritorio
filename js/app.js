@@ -185,8 +185,8 @@ btnConfirmarEditar.addEventListener("click", function() {
     if (registro) {
       nombreInput.value = registro.nombre;
       territorioInput.value = registro.territorio;
-      fechaInicioInput.value = registro.fechaInicio;
-      fechaFinInput.value = registro.fechaFin || "";
+      fechaInicioInput.value = fechaAInput(registro.fechaInicio);
+      fechaFinInput.value = fechaAInput(registro.fechaFin);
       editIdInput.value = registro.id;
 
       formTitle.textContent = "Editar Registro";
@@ -436,6 +436,15 @@ function formatoFecha(fecha) {
     return parts[2] + "/" + parts[1] + "/" + parts[0];
   }
   return fecha;
+}
+
+function fechaAInput(fecha) {
+  if (!fecha) return "";
+  var parts = fecha.split("/");
+  if (parts.length === 3) {
+    return parts[2] + "-" + parts[1] + "-" + parts[0];
+  }
+  return "";
 }
 
 function escapeHtml(text) {
