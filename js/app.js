@@ -489,17 +489,23 @@ async function verificarNotificacion() {
 }
 
 function mostrarNotificacion(mensaje) {
-  if ("Notification" in window) {
-    if (Notification.permission === "granted") {
-      new Notification("RTerritorio", { body: mensaje, icon: "icon-192.png" });
-    } else if (Notification.permission !== "denied") {
-      Notification.requestPermission().then(function(permission) {
-        if (permission === "granted") {
-          new Notification("RTerritorio", { body: mensaje, icon: "icon-192.png" });
-        }
-      });
-    }
+  showNotification(mensaje, "success");
+
+  if ("Notification" in window && Notification.permission === "default") {
+    Notification.requestPermission();
   }
 
-  showNotification(mensaje, "success");
+  if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.ready.then(function(reg) {
+      reg.showNotification("RTerritorio", {
+        body: mensaje,
+        icon: "icon-192.png",
+        badge: "icon-192.png",
+        tag: "rterritorio-notif",
+        renotify: true
+      });
+    });
+  } else if ("Notification" in window && Notification.permission === "granted") {
+    new Notification("RTerritorio", { body: mensaje, icon: "icon-192.png" });
+  }
 }
