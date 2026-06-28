@@ -182,33 +182,8 @@
 
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("OneSignalSDKWorker.js");
-      navigator.serviceWorker.register("service-worker.js").then(function(reg) {
-        reg.addEventListener("updatefound", function() {
-          var newWorker = reg.installing;
-          newWorker.addEventListener("statechange", function() {
-            if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-              document.getElementById("update-banner").style.display = "flex";
-            }
-          });
-        });
-      });
-
-      var refreshing = false;
-      navigator.serviceWorker.addEventListener("controllerchange", function() {
-        if (!refreshing) {
-          refreshing = true;
-          window.location.reload();
-        }
-      });
+      navigator.serviceWorker.register("service-worker.js");
     }
-
-    document.getElementById("btnUpdate").addEventListener("click", function() {
-      navigator.serviceWorker.getRegistration().then(function(reg) {
-        if (reg && reg.waiting) {
-          reg.waiting.postMessage({ type: "SKIP_WAITING" });
-        }
-      });
-    });
   </script>
 </body>
 </html>

@@ -1,20 +1,4 @@
-var CACHE_NAME = "rterritorio-v10";
-var ASSETS = [
-  "./",
-  "./index.html",
-  "./css/styles.css",
-  "./js/app.js",
-  "./js/export.js",
-  "./icon-192.png",
-  "./icon-512.png"
-];
-
 self.addEventListener("install", function(event) {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(function(cache) {
-      return cache.addAll(ASSETS);
-    })
-  );
   self.skipWaiting();
 });
 
@@ -22,30 +6,19 @@ self.addEventListener("activate", function(event) {
   event.waitUntil(
     caches.keys().then(function(cacheNames) {
       return Promise.all(
-        cacheNames.filter(function(name) {
-          return name !== CACHE_NAME;
-        }).map(function(name) {
-          return caches.delete(name);
-        })
+        cacheNames.map(function(name) { return caches.delete(name); })
       );
     })
   );
   self.clients.claim();
 });
 
-self.addEventListener("message", function(event) {
-  if (event.data && event.data.type === "SKIP_WAITING") {
-    self.skipWaiting();
-  }
-});
-
 self.addEventListener("fetch", function(event) {
   if (event.request.url.includes("script.google.com")) return;
-
   event.respondWith(
     fetch(event.request).then(function(response) {
       var clone = response.clone();
-      caches.open(CACHE_NAME).then(function(cache) {
+      caches.open("rterritorio-v12").then(function(cache) {
         cache.put(event.request, clone);
       });
       return response;
