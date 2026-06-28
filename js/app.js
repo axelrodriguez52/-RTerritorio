@@ -459,20 +459,14 @@ function showNotification(message, type) {
 }
 
 function programarNotificacion() {
-  var now = new Date();
-  var target = new Date();
-  target.setHours(13, 0, 0, 0);
+  setInterval(function() {
+    var now = new Date();
+    if (now.getHours() === 13 && now.getMinutes() === 0) {
+      verificarNotificacion();
+    }
+  }, 60000);
 
-  if (now >= target) {
-    target.setDate(target.getDate() + 1);
-  }
-
-  var delay = target.getTime() - now.getTime();
-
-  setTimeout(function() {
-    verificarNotificacion();
-    programarNotificacion();
-  }, delay);
+  verificarNotificacion();
 }
 
 async function verificarNotificacion() {
