@@ -49,6 +49,8 @@ function hideOfflineBanner() {
 document.addEventListener("DOMContentLoaded", function() {
   if (!isOnline()) showOfflineBanner();
   cargarRegistros();
+  verificarNotificacion();
+  programarNotificacion();
 });
 
 window.addEventListener("online", function() {
@@ -410,4 +412,50 @@ function showNotification(message, type) {
   setTimeout(function() {
     notification.className = "notification";
   }, 3000);
+}
+
+function programarNotificacion() {
+  var now = new Date();
+  var target = new Date();
+  target.setHours(13, 0, 0, 0);
+
+  if (now >= target) {
+    target.setDate(target.getDate() + 1);
+  }
+
+  var delay = target.getTime() - now.getTime();
+
+  setTimeout(function() {
+    verificarNotificacion();
+    programarNotificacion();
+  }, delay);
+}
+
+async function verificarNotificacion() {
+  if (!isOnline()) return;
+
+  try {
+    var response = await fetch(APPS_SCRIPT_URL + "?action=getNotification");
+    var result = await response.json();
+
+    if (result.success) {
+      mostrarNotificacion(result.message);
+    }
+  } catch (e) {}
+}
+
+function mostrarNotificacion(mensaje) {
+  if ("Notification" in window) {
+    if (Notification.permission === "granted") {
+      new Notification("RTerritorio", { body: mensaje, icon: "icon-192.png" });
+    } else if (Notification.permission !== "denied") {
+      Notification.requestPermission().then(function(permission) {
+        if (permission === "granted") {
+          new Notification("RTerritorio", { body: mensaje, icon: "icon-192.png" });
+        }
+      });
+    }
+  }
+
+  showNotification(mensaje, "success");
 }

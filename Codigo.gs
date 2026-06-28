@@ -10,11 +10,8 @@ function jsonResponse(data) {
 function doGet(e) {
   var action = e.parameter.action;
 
-  if (action === "login") return validarLogin(e.parameter.user, e.parameter.pass);
   if (action === "getAll") return getAllRegistros(e.parameter.user);
-  if (action === "heartbeat") return heartbeat(e.parameter.user);
-  if (action === "logout") return logout(e.parameter.user);
-  if (action === "getOnline") return getOnlineUsers();
+  if (action === "getNotification") return verificarNotificacion();
 
   return jsonResponse({ success: false, message: "Accion no valida" });
 }
@@ -245,4 +242,91 @@ function getUserRol(user) {
 
 function generateId() {
   return Utilities.getUuid().split("-")[0] + Date.now().toString(36);
+}
+
+var NOTIFICATIONS_SHEET = "Notificaciones";
+
+function getOrCreateNotificationsSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(NOTIFICATIONS_SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(NOTIFICATIONS_SHEET);
+    sheet.appendRow(["fecha", "mensaje", "activo"]);
+  }
+  return sheet;
+}
+
+function verificarNotificacion() {
+  var sheet = getOrCreateNotificationsSheet();
+  var data = sheet.getDataRange().getValues();
+  var today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd");
+
+  for (var i = 1; i < data.length; i++) {
+    var fecha = Utilities.formatDate(new Date(data[i][0]), Session.getScriptTimeZone(), "yyyy-MM-dd");
+    if (fecha === today && data[i][2] === true) {
+      return jsonResponse({ success: true, message: data[i][1], fecha: fecha });
+    }
+  }
+
+  return jsonResponse({ success: false, message: "Sin notificacion pendiente" });
+}
+
+function generarNotificacionDiaria() {
+  var sheet = getOrCreateSheet(SHEET_NAME);
+  var data = sheet.getDataRange().getValues();
+  var today = new Date();
+  var todayStr = Utilities.formatDate(today, Session.getScriptTimeZone(), "yyyy-MM-dd");
+  var dayOfWeek = today.getDay();
+
+  var diasConRegistros = {};
+  var registrosHoy = 0;
+
+  for (var i = 1; i < data.length; i++) {
+    if (!data[i][2]) continue;
+    var fecha = new Date(data[i][2]);
+    var fechaStr = Utilities.formatDate(fecha, Session.getScriptTimeZone(), "yyyy-MM-dd");
+
+    if (fechaStr === todayStr) registrosHoy++;
+
+    var day = fecha.getDay();
+    diasConRegistros[day] = (diasConRegistros[day] || 0) + 1;
+  }
+
+  var maxRegistros = 0;
+  var diasTop = [];
+  for (var d in diasConRegistros) {
+    if (diasConRegistros[d] > maxRegistros) {
+      maxRegistros = diasConRegistros[d];
+      diasTop = [parseInt(d)];
+    } else if (diasConRegistros[d] === maxRegistros) {
+      diasTop.push(parseInt(d));
+    }
+  }
+
+  var esFinDeSemana = (dayOfWeek === 0 || dayOfWeek === 6);
+  var esDiaTop = diasTop.indexOf(dayOfWeek) !== -1;
+
+  if (esFinDeSemana || esDiaTop) {
+    var notifSheet = getOrCreateNotificationsSheet();
+    var mensaje = "";
+
+    if (esFinDeSemana) {
+      if (registrosHoy === 0) {
+        mensaje = "Hoy es fin de semana. Recuerda registrar el territorio visitado.";
+      } else {
+        mensaje = "Buen trabajo! Ya registraste " + registrosHoy + " territorio(s) hoy. Sigue asi!";
+      }
+    } else {
+      if (registrosHoy === 0) {
+        mensaje = "Es uno de los dias mas activos de la semana. No olvides registrar tu territorio.";
+      } else {
+        mensaje = "Hoy es un dia de alta actividad. Ya tienes " + registrosHoy + " registro(s).";
+      }
+    }
+
+    notifSheet.appendRow([new Date(), mensaje, true]);
+    Logger.log("Notificacion generada: " + mensaje);
+  } else {
+    Logger.log("Hoy no es dia de notificacion (dia " + dayOfWeek + ")");
+  }
 }
