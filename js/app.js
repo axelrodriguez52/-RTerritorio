@@ -1,4 +1,4 @@
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx58_vGZPvMEJcLvCgaPIPnQrJTg4ATBYQAInuRd238zsHhF9n28_8K4gMEcXlUUBEXfA/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4e2Co8cRjwj95nbWZDIV0Q-gbE-FJVFPsFc1Rw5vW0iBVv_50ieu66Yzt3rKAWjdecg/exec";
 
 let registros = [];
 let idToDelete = null;
