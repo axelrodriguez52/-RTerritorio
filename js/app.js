@@ -439,10 +439,17 @@ function renderizarTabla(data) {
       '<td class="actions">' +
         (isLocal
           ? '<span class="sync-badge" title="Pendiente de sincronizar">&#9851;</span>'
-          : '<button class="btn-icon edit" onclick="prepararEdicion(\'' + registro.id + '\')" title="Editar">&#9998;</button>' +
-            '<button class="btn-icon delete" onclick="confirmarEliminar(\'' + registro.id + '\')" title="Eliminar">&#128465;</button>') +
+          : '<button class="btn-icon edit btn-edit-row" data-id="' + registro.id + '" title="Editar">&#9998;</button>' +
+            '<button class="btn-icon delete btn-delete-row" data-id="' + registro.id + '" title="Eliminar">&#128465;</button>') +
       "</td>";
     registrosBody.appendChild(row);
+  });
+
+  registrosBody.querySelectorAll(".btn-edit-row").forEach(function(btn) {
+    btn.addEventListener("click", function() { prepararEdicion(this.dataset.id); });
+  });
+  registrosBody.querySelectorAll(".btn-delete-row").forEach(function(btn) {
+    btn.addEventListener("click", function() { confirmarEliminar(this.dataset.id); });
   });
 }
 
